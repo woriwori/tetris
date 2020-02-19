@@ -1,1 +1,21 @@
 <!-- the order of the scripts that we add at the end is essential. -->
+
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Press+Start+2P">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<div class="grid">
+    <canvas id="board" class="game-board"></canvas>
+    <div class="right-colulmn">
+        <div>
+            <h1>TETRIS</h1>
+            <p>Score: <span id="score">0</span></p>
+            <p>Lines: <span id="lines">0</span></p>
+            <p>Level: <span id="level">0</span></p>
+            <canvas id="next" class="next"></canvas>
+        </div>
+        <button onclick="play()" class="play-button">Play</button>
+    </div>
+</div>
+<script src="./constants.js"></script>
+<script src="./main.js"></script>
