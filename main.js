@@ -1,5 +1,5 @@
 /* code to initialize the game and the overall game logic. */
-import { Board } from './board.js';
+import Board from './board.js';
 import { COLS, ROWS, BLOCK_SIZE } from './constants';
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
