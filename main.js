@@ -10,3 +10,9 @@ ctx.canvas.height = ROWS * BLOCK_SIZE;
 // // Scale blocks
 // // scalle은 x,y축으로 N배만큼 확대함. (좌표/길이/선두께 포함)
 ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
+
+let board = new Board();
+function play() {
+  board.reset();
+  console.table(board.grid);
+}
