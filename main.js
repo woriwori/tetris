@@ -17,3 +17,4 @@ function play() {
   board.reset();
   console.table(board.grid);
 }
+window.play = play;
