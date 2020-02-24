@@ -1,5 +1,6 @@
 /* code to initialize the game and the overall game logic. */
-import _ from './board.js';
+import Board from './board.js';
+import Piece from './piece';
 import { COLS, ROWS, BLOCK_SIZE } from './constants';
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
@@ -14,7 +15,10 @@ ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
 
 let board = new Board();
 function play() {
-  board.reset();
-  console.table(board.grid);
+  board = board.reset();
+  let piece = new Piece(ctx);
+  piece.draw();
+  board.piece = piece;
+  console.log(piece);
 }
 window.play = play;

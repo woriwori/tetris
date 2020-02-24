@@ -4,7 +4,7 @@ export default class Board {
   grid;
   reset() {
     // 게임 시작전 보드 초기화
-    this.grid = this.getEmptyBoard();
+    return this.getEmptyBoard();
   }
   getEmptyBoard() {
     // ROWS * COLS 의 2차원 배열 생성됨.
