@@ -1,5 +1,12 @@
 /* for piece logic. */
 export default class Piece {
+  /* 
+  x : board에서의 x 좌표
+  y : board에서의 y 좌표
+  color : block 색
+  shape : block 을 행렬로 표현한 2차원 배열
+  ctx : canvas 객체
+  */
   x;
   y;
   color;

@@ -9,27 +9,29 @@ const ctx = canvas.getContext('2d');
 ctx.canvas.width = COLS * BLOCK_SIZE;
 ctx.canvas.height = ROWS * BLOCK_SIZE;
 
-// // Scale blocks
-// // scalle은 x,y축으로 N배만큼 확대함. (좌표/길이/선두께 포함)
+// Scale blocks
+// scale은 x,y축으로 N배만큼 확대함. (좌표/길이/선두께 포함)
 ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
 
 let board = new Board();
 function play() {
   board = board.reset();
   let piece = new Piece(ctx);
-  piece.draw();
+  piece.draw(); // 화면에 shape(테트리스 블록 1개)을 그림
   board.piece = piece;
-  console.log(piece);
+  console.log(piece); // piece는 shape(테트리스 블록 1개) 가 포함된 객체
 }
 window.play = play;
 
 const moves = {
-  // p = piece, block 의 현재 position
+  // p : piece 클래스 인스턴스
+  // p.x, p.y : block의 x,y축 좌표
   [KEY.LEFT]: p => ({ ...p, x: p.x - 1 }),
   [KEY.RIGHT]: p => ({ ...p, x: p.x + 1 }),
   [KEY.DOWN]: p => ({ ...p, y: p.y + 1 }),
-  [KEY.SPACE]: p => ({ ...p, y: p.y + 1 }),
+  [KEY.SPACE]: p => board.rotate(p),
 };
+
 document.addEventListener('keydown', e => {
   if (moves[e.keyCode]) {
     e.preventDefault(); // stop event bubbling
