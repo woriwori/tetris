@@ -1,7 +1,7 @@
 /* code to initialize the game and the overall game logic. */
 import Board from './board.js';
 import Piece from './piece';
-import { COLS, ROWS, BLOCK_SIZE } from './constants';
+import { COLS, ROWS, BLOCK_SIZE, KEY } from './constants';
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 
@@ -22,3 +22,28 @@ function play() {
   console.log(piece);
 }
 window.play = play;
+
+const moves = {
+  // p = piece, block 의 현재 position
+  [KEY.LEFT]: p => ({ ...p, x: p.x - 1 }),
+  [KEY.RIGHT]: p => ({ ...p, x: p.x + 1 }),
+  [KEY.DOWN]: p => ({ ...p, y: p.y + 1 }),
+  [KEY.SPACE]: p => ({ ...p, y: p.y + 1 }),
+};
+document.addEventListener('keydown', e => {
+  if (moves[e.keyCode]) {
+    e.preventDefault(); // stop event bubbling
+    let p = moves[e.keyCode](board.piece);
+    if (e.keyCode === KEY.SPACE) {
+      while (board.valid(p)) {
+        board.piece.move(p);
+        p = moves[KEY.DOWN](board.piece);
+      }
+    } else if (board.valid(p)) {
+      // block 이동이 가능한 경우. (벽에 안부딪힘)
+      board.piece.move(p);
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
+      board.piece.draw();
+    }
+  }
+});
