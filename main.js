@@ -19,13 +19,13 @@ window.play = play;
 const moves = {
   // p : piece 클래스 인스턴스
   // p.x, p.y : block의 x,y축 좌표
-  [KEY.LEFT]: p => ({ ...p, x: p.x - 1 }),
-  [KEY.RIGHT]: p => ({ ...p, x: p.x + 1 }),
-  [KEY.DOWN]: p => ({ ...p, y: p.y + 1 }),
-  [KEY.SPACE]: p => board.rotate(p),
+  [KEY.LEFT]: (p) => ({ ...p, x: p.x - 1 }),
+  [KEY.RIGHT]: (p) => ({ ...p, x: p.x + 1 }),
+  [KEY.DOWN]: (p) => ({ ...p, y: p.y + 1 }),
+  [KEY.SPACE]: (p) => board.rotate(p),
 };
 
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', (e) => {
   if (moves[e.keyCode]) {
     e.preventDefault(); // stop event bubbling
     let p = moves[e.keyCode](board.piece);

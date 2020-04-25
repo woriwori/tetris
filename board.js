@@ -32,7 +32,7 @@ export default class Board {
       return row.every((value, dx) => {
         let x = p.x + dx;
         let y = p.y + dy;
-        return value === 0 || (this.insideWalls(x) && this.aboveFloor(y));
+        return value === 0 || (this.insideWalls(x) && this.aboveFloor(y) && this.notOccupied(x, y));
       });
     });
   }
@@ -41,5 +41,8 @@ export default class Board {
   }
   aboveFloor(y) {
     return y <= ROWS;
+  }
+  notOccupied(x, y) {
+    return this.grid[y] && this.grid[y][x] === 0;
   }
 }
