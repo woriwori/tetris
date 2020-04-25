@@ -10,6 +10,7 @@ let board = new Board(ctx);
 function play() {
   board.reset();
   let piece = new Piece(ctx);
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
   piece.draw(); // 화면에 shape(테트리스 블록 1개)을 그림
   board.piece = piece;
   console.log(piece); // piece는 shape(테트리스 블록 1개) 가 포함된 객체
