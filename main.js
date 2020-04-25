@@ -31,6 +31,7 @@ document.addEventListener('keydown', (e) => {
     let p = moves[e.keyCode](board.piece);
     if (e.keyCode === KEY.SPACE) {
       while (board.valid(p)) {
+        // hard drop
         board.piece.move(p);
         p = moves[KEY.DOWN](board.piece);
       }
