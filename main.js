@@ -39,8 +39,8 @@ document.addEventListener('keydown', (e) => {
     } else if (board.valid(p)) {
       // block 이동이 가능한 경우. (벽에 안부딪힘)
       board.piece.move(p);
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
-      board.piece.draw();
     }
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
+    board.piece.draw();
   }
 });
