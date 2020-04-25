@@ -45,4 +45,18 @@ export default class Board {
   notOccupied(x, y) {
     return this.grid[y] && this.grid[y][x] === 0;
   }
+  rotate(piece, direction) {
+    // Clone with JSON for immutability.
+    // spread 연산자로 하면 1 level 밖에 못하니까 아래처럼 함.
+    let p = JSON.parse(JSON.stringify(piece));
+    // Transpose matrix
+    for (let y = 0; y < p.shape.length; ++y) {
+      for (let x = 0; x < y; ++x) {
+        [p.shape[x][y], p.shape[y][x]] = [p.shape[y][x], p.shape[x][y]];
+      }
+    }
+    p.shape.forEach((row) => row.reverse());
+
+    return p;
+  }
 }
