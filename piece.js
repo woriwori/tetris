@@ -1,3 +1,4 @@
+import { COLORS, SHAPES } from './constants';
 /* for piece logic. */
 export default class Piece {
   /* 
@@ -12,18 +13,15 @@ export default class Piece {
   color;
   shape;
   ctx;
+  typeId;
   constructor(ctx) {
     this.ctx = ctx;
     this.spawn();
   }
   spawn() {
-    this.color = 'blue';
-    this.shape = [
-      [2, 0, 0],
-      [2, 2, 2],
-      [0, 0, 0],
-    ];
-
+    this.typeId = this.randomizeTetrominoType(COLORS.length - 1);
+    this.shape = SHAPES[this.typeId];
+    this.color = COLORS[this.typeId];
     // starting position
     this.x = 3;
     this.y = 0;
@@ -44,5 +42,8 @@ export default class Piece {
     this.x = p.x;
     this.y = p.y;
     this.shape = p.shape;
+  }
+  randomizeTetrominoType(noOfTypes) {
+    return Math.floor(Math.random() * noOfTypes + 1);
   }
 }
