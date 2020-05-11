@@ -1,6 +1,6 @@
 /* code to initialize the game and the overall game logic. */
 import Board from './board.js';
-import { POINTS, KEY, LEVEL } from './constants';
+import { BLOCK_SIZE, POINTS, KEY, LEVEL } from './constants';
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const canvasNext = document.getElementById('next');
@@ -31,14 +31,19 @@ export let account = new Proxy(accountValues, {
   },
 });
 
+initNext();
+
+function initNext() {
+  // Calculate size of canvas from constants.
+  ctxNext.canvas.width = 4 * BLOCK_SIZE;
+  ctxNext.canvas.height = 4 * BLOCK_SIZE;
+  ctxNext.scale(BLOCK_SIZE / 2, BLOCK_SIZE / 2);
+  // 샘플코드는 /2 를 안해도 잘 되는데 왜 나는 /2를 해야하는지 모르겠음.
+}
+
 function play() {
   resetGame();
   animate();
-  // let piece = new Piece(ctx);
-  // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
-  // piece.draw(); // 화면에 shape(테트리스 블록 1개)을 그림
-  // board.piece = piece;
-  // console.log(piece); // piece는 shape(테트리스 블록 1개) 가 포함된 객체
 }
 window.play = play;
 
