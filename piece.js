@@ -46,4 +46,7 @@ export default class Piece {
   randomizeTetrominoType(noOfTypes) {
     return Math.floor(Math.random() * noOfTypes + 1);
   }
+  setStartingPosition() {
+    this.x = this.typeId === 4 ? 4 : 3;
+  }
 }

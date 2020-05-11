@@ -4,20 +4,41 @@ import Piece from './piece';
 import { COLS, ROWS, BLOCK_SIZE, KEY } from './constants';
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
+const canvasNext = document.getElementById('next');
+const ctxNext = canvasNext.getContext('2d');
 
-let board = new Board(ctx);
+let board = new Board(ctx, ctxNext);
+let requestId;
+let time = { start: 0, elapsed: 0, level: 1000 };
 
 function play() {
   board.reset();
-  let piece = new Piece(ctx);
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
-  piece.draw(); // 화면에 shape(테트리스 블록 1개)을 그림
-  board.piece = piece;
-  console.log(piece); // piece는 shape(테트리스 블록 1개) 가 포함된 객체
+  animate();
+  // let piece = new Piece(ctx);
+  // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
+  // piece.draw(); // 화면에 shape(테트리스 블록 1개)을 그림
+  // board.piece = piece;
+  // console.log(piece); // piece는 shape(테트리스 블록 1개) 가 포함된 객체
 }
 window.play = play;
 
-const moves = {
+function animate(now = 0) {
+  time.elapsed = now - time.start;
+  if (time.elapsed > time.level) {
+    time.start = now;
+    if (!board.drop()) {
+      // gameOver();
+      return;
+    }
+  }
+
+  // Clear board before drawing new state.
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  board.draw();
+  requestId = requestAnimationFrame(animate);
+}
+export const moves = {
   // p : piece 클래스 인스턴스
   // p.x, p.y : block의 x,y축 좌표
   [KEY.LEFT]: (p) => ({ ...p, x: p.x - 1 }),

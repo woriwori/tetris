@@ -1,11 +1,15 @@
 /* for board logic. */
+import Piece from './piece';
 import { COLS, ROWS, BLOCK_SIZE, KEY } from './constants';
+import { moves } from './main';
 export default class Board {
   ctx;
+  ctxNext;
   grid;
   piece;
-  constructor(ctx) {
+  constructor(ctx, ctxNext) {
     this.ctx = ctx;
+    this.ctxNext = ctxNext;
     this.init();
   }
   init() {
@@ -20,6 +24,15 @@ export default class Board {
     // 게임 시작전 보드 초기화
     // return this.getEmptyBoard();
     this.grid = this.getEmptyGrid();
+    this.piece = new Piece(this.ctx);
+    this.piece.setStartingPosition();
+    this.getNewPiece();
+  }
+
+  getNewPiece() {
+    this.next = new Piece(this.ctxNext);
+    this.ctxNext.clearRect(0, 0, this.ctxNext.canvas.width, this.ctxNext.canvas.height);
+    this.next.draw();
   }
   getEmptyGrid() {
     // ROWS * COLS 의 2차원 배열 생성됨.
@@ -58,5 +71,40 @@ export default class Board {
     p.shape.forEach((row) => row.reverse());
 
     return p;
+  }
+
+  draw() {
+    this.piece.draw();
+    this.drawBoard();
+  }
+
+  drawBoard() {
+    this.grid.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (value > 0) {
+          this.ctx.fillStyle = COLORS[value];
+          this.ctx.fillRect(x, y, 1, 1);
+        }
+      });
+    });
+  }
+
+  drop() {
+    let p = moves[KEY.DOWN](this.piece);
+    if (this.valid(p)) {
+      this.piece.move(p);
+    } else {
+      // this.freeze();
+      // this.clearLines();
+      if (this.piece.y === 0) {
+        // Game over
+        return false;
+      }
+      this.piece = this.next;
+      this.piece.ctx = this.ctx;
+      this.piece.setStartingPosition();
+      this.getNewPiece();
+    }
+    return true;
   }
 }
