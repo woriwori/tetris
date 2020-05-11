@@ -1,7 +1,6 @@
 /* code to initialize the game and the overall game logic. */
 import Board from './board.js';
-import Piece from './piece';
-import { COLS, ROWS, BLOCK_SIZE, KEY } from './constants';
+import { POINTS, KEY } from './constants';
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const canvasNext = document.getElementById('next');
@@ -10,6 +9,27 @@ const ctxNext = canvasNext.getContext('2d');
 let board = new Board(ctx, ctxNext);
 let requestId;
 let time = { start: 0, elapsed: 0, level: 1000 };
+
+let accountValues = {
+  score: 0,
+  level: 0,
+  lines: 0,
+};
+
+function updateAccount(key, value) {
+  let element = document.getElementById(key);
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+export let account = new Proxy(accountValues, {
+  set: (target, key, value) => {
+    target[key] = value;
+    updateAccount(key, value);
+    return true;
+  },
+});
 
 function play() {
   board.reset();
@@ -55,12 +75,16 @@ document.addEventListener('keydown', (e) => {
     if (e.keyCode === KEY.SPACE) {
       while (board.valid(p)) {
         // hard drop
+        account.score += POINTS.HARD_DROP;
         board.piece.move(p);
         p = moves[KEY.DOWN](board.piece);
       }
     } else if (board.valid(p)) {
       // block 이동이 가능한 경우. (벽에 안부딪힘)
       board.piece.move(p);
+      if (event.keyCode === KEY.DOWN) {
+        account.score += POINTS.SOFT_DROP;
+      }
     }
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
     board.piece.draw();
