@@ -1,6 +1,6 @@
 /* for board logic. */
 import Piece from './piece';
-import { COLS, ROWS, BLOCK_SIZE, KEY } from './constants';
+import { COLS, ROWS, BLOCK_SIZE, KEY, COLORS } from './constants';
 import { moves } from './main';
 export default class Board {
   ctx;
@@ -94,8 +94,8 @@ export default class Board {
     if (this.valid(p)) {
       this.piece.move(p);
     } else {
-      // this.freeze();
-      // this.clearLines();
+      this.freeze();
+      this.clearLines();
       if (this.piece.y === 0) {
         // Game over
         return false;
@@ -106,5 +106,50 @@ export default class Board {
       this.getNewPiece();
     }
     return true;
+  }
+  freeze() {
+    this.piece.shape.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (value > 0) {
+          this.grid[y + this.piece.y][x + this.piece.x] = value;
+        }
+      });
+    });
+  }
+  clearLines() {
+    let lines = 0;
+
+    this.grid.forEach((row, y) => {
+      // If every value is greater than 0.
+      if (row.every((value) => value > 0)) {
+        lines++;
+
+        // Remove the row.
+        this.grid.splice(y, 1);
+
+        // Add zero filled row at the top.
+        this.grid.unshift(Array(COLS).fill(0));
+      }
+    });
+
+    if (lines > 0) {
+      // Calculate points from cleared lines and level.
+      // account.score += this.getLinesClearedPoints(lines);
+      // account.lines += lines;
+      // // If we have reached the lines for next level
+      // if (account.lines >= LINES_PER_LEVEL) {
+      //   // Goto next level
+      //   account.level++;
+      //   // Remove lines so we start working for the next level
+      //   account.lines -= LINES_PER_LEVEL;
+      //   // Increase speed of game
+      //   time.level = LEVEL[account.level];
+      // }
+    }
+  }
+  getLinesClearedPoints(lines, level) {
+    const lineClearPoints = lines === 1 ? POINTS.SINGLE : lines === 2 ? POINTS.DOUBLE : lines === 3 ? POINTS.TRIPLE : lines === 4 ? POINTS.TETRIS : 0;
+
+    return (account.level + 1) * lineClearPoints;
   }
 }
