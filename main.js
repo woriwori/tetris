@@ -1,6 +1,6 @@
 /* code to initialize the game and the overall game logic. */
 import Board from './board.js';
-import { POINTS, KEY } from './constants';
+import { POINTS, KEY, LEVEL } from './constants';
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const canvasNext = document.getElementById('next');
@@ -8,7 +8,7 @@ const ctxNext = canvasNext.getContext('2d');
 
 let board = new Board(ctx, ctxNext);
 let requestId;
-let time = { start: 0, elapsed: 0, level: 1000 };
+export let time;
 
 let accountValues = {
   score: 0,
@@ -32,7 +32,7 @@ export let account = new Proxy(accountValues, {
 });
 
 function play() {
-  board.reset();
+  resetGame();
   animate();
   // let piece = new Piece(ctx);
   // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
@@ -41,6 +41,14 @@ function play() {
   // console.log(piece); // piece는 shape(테트리스 블록 1개) 가 포함된 객체
 }
 window.play = play;
+
+function resetGame() {
+  account.score = 0;
+  account.lines = 0;
+  account.level = 0;
+  board.reset();
+  time = { start: 0, elapsed: 0, level: LEVEL[account.level] };
+}
 
 function animate(now = 0) {
   time.elapsed = now - time.start;

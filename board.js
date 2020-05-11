@@ -1,7 +1,7 @@
 /* for board logic. */
 import Piece from './piece';
-import { COLS, ROWS, BLOCK_SIZE, KEY, COLORS, POINTS } from './constants';
-import { moves, account } from './main';
+import { COLS, ROWS, BLOCK_SIZE, LINES_PER_LEVEL, KEY, COLORS, POINTS, LEVEL } from './constants';
+import { moves, account, time } from './main';
 export default class Board {
   ctx;
   ctxNext;
@@ -135,16 +135,16 @@ export default class Board {
     if (lines > 0) {
       // Calculate points from cleared lines and level.
       account.score += this.getLinesClearedPoints(lines);
-      // account.lines += lines;
-      // // If we have reached the lines for next level
-      // if (account.lines >= LINES_PER_LEVEL) {
-      //   // Goto next level
-      //   account.level++;
-      //   // Remove lines so we start working for the next level
-      //   account.lines -= LINES_PER_LEVEL;
-      //   // Increase speed of game
-      //   time.level = LEVEL[account.level];
-      // }
+      account.lines += lines;
+      // If we have reached the lines for next level
+      if (account.lines >= LINES_PER_LEVEL) {
+        // Goto next level
+        account.level++;
+        // Remove lines so we start working for the next level
+        account.lines -= LINES_PER_LEVEL;
+        // Increase speed of game
+        time.level = LEVEL[account.level];
+      }
     }
   }
   getLinesClearedPoints(lines, level) {
