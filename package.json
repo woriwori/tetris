@@ -4,7 +4,9 @@
   "description": "출처 : https://medium.com/@michael.karen/learning-modern-javascript-with-tetris-92d532bcd057",
   "main": "main.js",
   "scripts": {
-    "build": "webpack -w"
+    "build": "webpack -w",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "repository": {
     "type": "git",
@@ -16,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/woriwori/tetris/issues"
   },
-  "homepage": "https://github.com/woriwori/tetris#readme",
+  "homepage": "https://woriwori.github.io/tetris/",
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.4",
@@ -25,6 +27,7 @@
     "babel-loader": "^8.0.6"
   },
   "dependencies": {
+    "gh-pages": "^2.2.0",
     "webpack": "^4.41.6",
     "webpack-cli": "^3.3.11"
   }
