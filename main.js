@@ -55,7 +55,7 @@ function animate(now = 0) {
   if (time.elapsed > time.level) {
     time.start = now;
     if (!board.drop()) {
-      // gameOver();
+      gameOver();
       return;
     }
   }
@@ -66,6 +66,16 @@ function animate(now = 0) {
   board.draw();
   requestId = requestAnimationFrame(animate);
 }
+
+function gameOver() {
+  cancelAnimationFrame(requestId);
+  ctx.fillStyle = 'black';
+  ctx.fillRect(1, 3, 8, 1.2);
+  ctx.font = '1px Arial';
+  ctx.fillStyle = 'red';
+  ctx.fillText('GAME OVER', 1.8, 4);
+}
+
 export const moves = {
   // p : piece 클래스 인스턴스
   // p.x, p.y : block의 x,y축 좌표
