@@ -113,6 +113,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 var Board = /*#__PURE__*/function () {
+  // 게임 진행 중인 html dom의 canvas 렌더링 컨텍스트
+  // 다음 블럭 보여줄 html dom의 canvas 렌더링 컨텍스트
+  // ROWS * COLS 의 2차원 배열
+  // 현재 블럭(piece)
+  // 다음 블럭(piece)
+
+  /* initialize */
   function Board(ctx, ctxNext) {
     _classCallCheck(this, Board);
 
@@ -123,6 +130,8 @@ var Board = /*#__PURE__*/function () {
     _defineProperty(this, "grid", void 0);
 
     _defineProperty(this, "piece", void 0);
+
+    _defineProperty(this, "next", void 0);
 
     this.ctx = ctx;
     this.ctxNext = ctxNext;
@@ -142,18 +151,10 @@ var Board = /*#__PURE__*/function () {
     key: "reset",
     value: function reset() {
       // 게임 시작전 보드 초기화
-      // return this.getEmptyBoard();
       this.grid = this.getEmptyGrid();
       this.piece = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"](this.ctx);
       this.piece.setStartingPosition();
       this.getNewPiece();
-    }
-  }, {
-    key: "getNewPiece",
-    value: function getNewPiece() {
-      this.next = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"](this.ctxNext);
-      this.ctxNext.clearRect(0, 0, this.ctxNext.canvas.width, this.ctxNext.canvas.height);
-      this.next.draw();
     }
   }, {
     key: "getEmptyGrid",
@@ -167,6 +168,15 @@ var Board = /*#__PURE__*/function () {
         return Array(_constants__WEBPACK_IMPORTED_MODULE_1__["COLS"]).fill(0);
       });
     }
+  }, {
+    key: "getNewPiece",
+    value: function getNewPiece() {
+      this.next = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"](this.ctxNext);
+      this.ctxNext.clearRect(0, 0, this.ctxNext.canvas.width, this.ctxNext.canvas.height);
+      this.next.draw();
+    }
+    /* true: 벽에 안부딪힘 / false: 벽에 부딪힘 */
+
   }, {
     key: "valid",
     value: function valid(p) {
@@ -195,6 +205,8 @@ var Board = /*#__PURE__*/function () {
     value: function notOccupied(x, y) {
       return this.grid[y] && this.grid[y][x] === 0;
     }
+    /* rotate */
+
   }, {
     key: "rotate",
     value: function rotate(piece, direction) {
@@ -215,20 +227,27 @@ var Board = /*#__PURE__*/function () {
       });
       return p;
     }
+    /* draw piece & grid */
+
   }, {
     key: "draw",
     value: function draw() {
-      this.piece.draw();
-      this.drawBoard();
+      this.piece.draw(); // ctx 위에 현재 블록을 그림
+
+      this.drawBoard(); // ctx 위에 현재 블록 전까지 쌓인 블록을 그림
     }
   }, {
     key: "drawBoard",
     value: function drawBoard() {
       var _this2 = this;
 
+      console.log('----board----');
+      console.table(this.grid);
+      console.log('----board----');
       this.grid.forEach(function (row, y) {
         row.forEach(function (value, x) {
           if (value > 0) {
+            // freeze() 함수를 통해 grid에 블록이 고정된 경우에만 이 조건실행문에 들어옴.
             _this2.ctx.fillStyle = _constants__WEBPACK_IMPORTED_MODULE_1__["COLORS"][value];
 
             _this2.ctx.fillRect(x, y, 1, 1);
@@ -236,26 +255,40 @@ var Board = /*#__PURE__*/function () {
         });
       });
     }
+    /* 자동으로 떨어지는 동작용 함수 */
+
+    /*  
+      timer로 계속 떨어지도록 하고 있기 때문에,
+      사용자가 방향키로 조작을 하더라도 계속 이 함수가 호출될 수 밖에 없음. 
+      그래서 사용자가 빠르게 아래키를 눌러서 땅에 닿아도, 
+      이 함수가 호출되기 전까지는 점수가 추가될 수 없음. (즉, 라인이 지워질 수 없음.)
+     */
+
   }, {
     key: "drop",
     value: function drop() {
       var p = _main__WEBPACK_IMPORTED_MODULE_2__["moves"][_constants__WEBPACK_IMPORTED_MODULE_1__["KEY"].DOWN](this.piece);
 
       if (this.valid(p)) {
+        // 땅에 안부딪힘
         this.piece.move(p);
       } else {
+        // 땅에 부딪힘
         this.freeze();
         this.clearLines();
 
         if (this.piece.y === 0) {
+          // 블록이 젤 꼭대기에 닿았을 때
           // Game over
           return false;
         }
 
-        this.piece = this.next;
-        this.piece.ctx = this.ctx;
+        this.piece = this.next; // 새 블록 추가
+
+        this.piece.ctx = this.ctx; // 이전 블록이 추가된 grid가 그려진 ctx
+
         this.piece.setStartingPosition();
-        this.getNewPiece();
+        this.getNewPiece(); // 다음에 나올 블록을 미리 세팅
       }
 
       return true;
@@ -265,6 +298,7 @@ var Board = /*#__PURE__*/function () {
     value: function freeze() {
       var _this3 = this;
 
+      // 블록이 쌓인 경우, 쌓인 블록을 ctx에 고정으로 draw함.
       this.piece.shape.forEach(function (row, y) {
         row.forEach(function (value, x) {
           if (value > 0) {
@@ -431,31 +465,7 @@ var canvas = document.getElementById('board');
 var ctx = canvas.getContext('2d');
 var canvasNext = document.getElementById('next');
 var ctxNext = canvasNext.getContext('2d');
-var board = new _board_js__WEBPACK_IMPORTED_MODULE_0__["default"](ctx, ctxNext);
-var requestId;
-var time;
-var accountValues = {
-  score: 0,
-  level: 0,
-  lines: 0
-};
-
-function updateAccount(key, value) {
-  var element = document.getElementById(key);
-
-  if (element) {
-    element.textContent = value;
-  }
-}
-
-var account = new Proxy(accountValues, {
-  set: function set(target, key, value) {
-    target[key] = value;
-    updateAccount(key, value);
-    return true;
-  }
-});
-initNext();
+/* initialize */
 
 function initNext() {
   // Calculate size of canvas from constants.
@@ -463,6 +473,36 @@ function initNext() {
   ctxNext.canvas.height = 4 * _constants__WEBPACK_IMPORTED_MODULE_1__["BLOCK_SIZE"];
   ctxNext.scale(_constants__WEBPACK_IMPORTED_MODULE_1__["BLOCK_SIZE"] / 2, _constants__WEBPACK_IMPORTED_MODULE_1__["BLOCK_SIZE"] / 2); // 샘플코드는 /2 를 안해도 잘 되는데 왜 나는 /2를 해야하는지 모르겠음.
 }
+
+initNext();
+/* declare */
+
+var board = new _board_js__WEBPACK_IMPORTED_MODULE_0__["default"](ctx, ctxNext);
+var requestId;
+var time; // account (score/level/deleted lines)
+
+var accountValues = {
+  score: 0,
+  level: 0,
+  lines: 0
+};
+var account = new Proxy(accountValues, {
+  set: function set(target, key, value) {
+    target[key] = value;
+    updateAccount(key, value);
+    return true;
+  }
+});
+
+function updateAccount(key, value) {
+  var element = document.getElementById(key);
+
+  if (element) {
+    element.textContent = value; // 점수 누적
+  }
+}
+/* play game */
+
 
 function play() {
   resetGame();
@@ -510,6 +550,8 @@ function gameOver() {
   ctx.fillStyle = 'red';
   ctx.fillText('GAME OVER', 1.8, 4);
 }
+/* control */
+
 
 var moves = (_moves = {}, _defineProperty(_moves, _constants__WEBPACK_IMPORTED_MODULE_1__["KEY"].LEFT, function (p) {
   return _objectSpread(_objectSpread({}, p), {}, {
@@ -534,17 +576,19 @@ document.addEventListener('keydown', function (e) {
   if (moves[e.keyCode]) {
     e.preventDefault(); // stop event bubbling
 
-    var p = moves[e.keyCode](board.piece);
+    var p = moves[e.keyCode](board.piece); // board.valid(p): true-벽에 안부딪힘 / false-벽에 부딪힘
 
     if (e.keyCode === _constants__WEBPACK_IMPORTED_MODULE_1__["KEY"].SPACE) {
       while (board.valid(p)) {
         // hard drop
         account.score += _constants__WEBPACK_IMPORTED_MODULE_1__["POINTS"].HARD_DROP;
         board.piece.move(p);
-        p = moves[_constants__WEBPACK_IMPORTED_MODULE_1__["KEY"].DOWN](board.piece);
+        p = moves[_constants__WEBPACK_IMPORTED_MODULE_1__["KEY"].DOWN](board.piece); // p가 while 조건문에 쓰이는걸 모르고 이 라인을 지웠다가 크롬 터짐
+        // 왜냐면 DOWN을 통한 y+1 을 반복하지않으면, while문에 무한루프가 걸림
+        // (y+1을 반복해야 바닥까지 닿아서 while문을 탈출할 수 있음)
       }
     } else if (board.valid(p)) {
-      // block 이동이 가능한 경우. (벽에 안부딪힘)
+      // 스페이스를 누르지 않은 경우
       board.piece.move(p);
 
       if (event.keyCode === _constants__WEBPACK_IMPORTED_MODULE_1__["KEY"].DOWN) {
@@ -552,7 +596,7 @@ document.addEventListener('keydown', function (e) {
       }
     }
 
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 이전 모양 지움
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 보드판 초기화
 
     board.piece.draw();
   }
@@ -584,8 +628,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var Piece = /*#__PURE__*/function () {
   /* 
-  x : board에서의 x 좌표
-  y : board에서의 y 좌표
+  x : grid에서의 x 좌표
+  y : grid에서의 y 좌표
   color : block 색
   shape : block 을 행렬로 표현한 2차원 배열
   ctx : canvas 객체
@@ -614,9 +658,9 @@ var Piece = /*#__PURE__*/function () {
     value: function spawn() {
       this.typeId = this.randomizeTetrominoType(_constants__WEBPACK_IMPORTED_MODULE_0__["COLORS"].length - 1);
       this.shape = _constants__WEBPACK_IMPORTED_MODULE_0__["SHAPES"][this.typeId];
-      this.color = _constants__WEBPACK_IMPORTED_MODULE_0__["COLORS"][this.typeId]; // starting position
+      this.color = _constants__WEBPACK_IMPORTED_MODULE_0__["COLORS"][this.typeId]; // set starting position
 
-      this.x = 3;
+      this.setStartingPosition();
       this.y = 0;
     }
   }, {
@@ -627,9 +671,10 @@ var Piece = /*#__PURE__*/function () {
       this.ctx.fillStyle = this.color;
       this.shape.forEach(function (row, y) {
         row.forEach(function (value, x) {
-          // x, y 는 shape 내에서 블록의 위치
-          // this.x + x 는 보드상 블록 위치
+          // x, y: shape 2차원 배열내에서 1의 값을 가진 원소의 인덱스
+          // this.x, this.y : grid 내의 블록 위치
           if (value > 0) {
+            // 원소 값이 1이면, 색을 채워서 블록 모양이 표시되도록함. (SHAPES 상수 참조)
             _this.ctx.fillRect(_this.x + x, _this.y + y, 1, 1);
           }
         });
